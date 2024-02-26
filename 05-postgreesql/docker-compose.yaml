@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  postgree:
+    image: postgres:latest
+    container_name: meu_banco_postgree
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: caio
+      POSTGRES_USER: caio
+      POSTGRES_DB: banana
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - ./conf/postgresql.conf:/etc/postgresql/postgresql.conf
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U caio -d banana'"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      postgree:
+        condition: service_healthy
